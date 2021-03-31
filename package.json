@@ -1,0 +1,11 @@
+{
+  "name": "breakup_backend",
+  "version": "1.0.0",
+  "description": "BreakUp backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hafeezul Kareem Shaik, P Anil Kumar",
+  "license": "ISC"
+}
