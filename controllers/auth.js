@@ -1,4 +1,6 @@
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const expressJwt = require("express-jwt");
 
 const User = require("../models/user");
 
@@ -26,4 +28,48 @@ exports.signup = (req, res) => {
          return res.status(201).json({ id: user._id });
       });
    });
+};
+
+exports.signin = (req, res) => {
+   const errors = validationResult(req.body);
+
+   if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array()[0].msg });
+   }
+
+   const { email, password } = req.body;
+   User.findOne({ email }).exec((error, user) => {
+      if (error || !user) {
+         return res
+            .status(400)
+            .json({ error: "User doesn't exists with the email" });
+      }
+
+      if (!user.authenticate(password)) {
+         return res
+            .status(401)
+            .json({ error: "Email and password doesn't match" });
+      }
+
+      const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+      res.cookie("token", token, { expire: new Date() + 1000 });
+
+      const { _id, email, name } = user;
+      return res.status(200).json({ token, id: _id, email, name });
+   });
+};
+
+exports.isSignedIn = expressJwt({
+   secret: process.env.SECRET,
+   userProperty: "auth",
+   algorithms: ["RS256"],
+});
+
+exports.isAuthenticated = (req, res, next) => {
+   const isAuthenticated =
+      req.profile && req.auth && req.profile._id == req.auth._id;
+   if (!isAuthenticated) {
+      return res.status(403).json({ error: "Access denied" });
+   }
+   next();
 };
