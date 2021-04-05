@@ -34,7 +34,7 @@ exports.createProject = (req, res) => {
             }
          );
          const { _id } = project;
-         return res.status(200).json({ projectId: _id });
+         return res.status(200).json({ id: _id });
       });
    });
 };
@@ -51,18 +51,18 @@ exports.getProjects = (req, res) => {
          const userProjects = [];
          projects.forEach((project) => {
             const {
-               _id: projectId,
+               _id: id,
                title,
                description,
                admin: { _id: adminId, name },
                stages,
             } = project;
             userProjects.push({
-               projectId,
+               id,
                title,
                description: description ? description : "",
-               adminId,
-               adminName: name,
+               admin_id,
+               admin_name: name,
                stages,
             });
          });
