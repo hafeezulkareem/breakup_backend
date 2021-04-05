@@ -21,10 +21,7 @@ const userSchema = new mongoose.Schema(
          required: true,
       },
       salt: String,
-      projects: {
-         type: Array,
-         default: [],
-      },
+      projects: [{ type: mongoose.Schema.ObjectId, ref: "Project" }],
    },
    { timestamp: true }
 );

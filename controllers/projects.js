@@ -21,10 +21,9 @@ exports.createProject = (req, res) => {
          if (error) {
             return res.status(400).json({ error: "Unable to create project" });
          }
-         const { _id } = project;
          User.findOneAndUpdate(
             { _id: userId },
-            { $push: { projects: _id } },
+            { $push: { projects: project } },
             { useFindAndModify: false },
             (error, projects) => {
                if (error) {
@@ -34,7 +33,39 @@ exports.createProject = (req, res) => {
                }
             }
          );
+         const { _id } = project;
          return res.status(200).json({ projectId: _id });
       });
    });
+};
+
+exports.getProjects = (req, res) => {
+   const { userId } = req.body;
+   User.findById(userId)
+      .populate({ path: "projects", populate: { path: "admin" } })
+      .exec((error, user) => {
+         if (error) {
+            return res.status(400).json({ error: "Unable to get projects" });
+         }
+         const { projects } = user;
+         const userProjects = [];
+         projects.forEach((project) => {
+            const {
+               _id: projectId,
+               title,
+               description,
+               admin: { _id: adminId, name },
+               stages,
+            } = project;
+            userProjects.push({
+               projectId,
+               title,
+               description: description ? description : "",
+               adminId,
+               adminName: name,
+               stages,
+            });
+         });
+         return res.status(200).json(userProjects);
+      });
 };

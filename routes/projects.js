@@ -3,7 +3,7 @@ const { check } = require("express-validator");
 
 const router = express.Router();
 
-const { createProject } = require("../controllers/projects");
+const { createProject, getProjects } = require("../controllers/projects");
 const { isSignedIn } = require("../controllers/auth");
 
 router.post(
@@ -12,5 +12,7 @@ router.post(
    isSignedIn,
    createProject
 );
+
+router.get("/projects", isSignedIn, getProjects);
 
 module.exports = router;
