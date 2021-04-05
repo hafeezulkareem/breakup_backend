@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const Project = require("../models/project");
+const { getUserDetailsFromToken } = require("../utils/authUtils");
 
 exports.createProject = (req, res) => {
    const errors = validationResult(req);
@@ -10,7 +11,8 @@ exports.createProject = (req, res) => {
       return res.status(422).json({ error: errors.array()[0] });
    }
 
-   const { userId, title } = req.body;
+   const { title } = req.body;
+   const { _id: userId } = getUserDetailsFromToken(req);
    User.findById(userId).exec((error, user) => {
       if (error || !user) {
          return res.status(400).json({ error: "User is not valid" });
@@ -40,7 +42,7 @@ exports.createProject = (req, res) => {
 };
 
 exports.getProjects = (req, res) => {
-   const { userId } = req.body;
+   const { _id: userId } = getUserDetailsFromToken(req);
    User.findById(userId)
       .populate({ path: "projects", populate: { path: "admin" } })
       .exec((error, user) => {
