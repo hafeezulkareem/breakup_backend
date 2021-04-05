@@ -25,7 +25,7 @@ exports.signup = (req, res) => {
                .status(400)
                .json({ error: "Unable to create account. Try again!" });
          }
-         return res.status(201).json({ id: user._id });
+         return res.status(201).json({});
       });
    });
 };
@@ -55,7 +55,7 @@ exports.signin = (req, res) => {
       res.cookie("token", token, { expire: new Date() + 604800 });
 
       const { _id, email, name } = user;
-      return res.status(200).json({ token, id: _id, email, name });
+      return res.status(200).json({ token, id: _id, name });
    });
 };
 
