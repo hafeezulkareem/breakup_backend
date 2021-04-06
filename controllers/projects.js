@@ -11,14 +11,14 @@ exports.createProject = (req, res) => {
       return res.status(422).json({ error: errors.array()[0] });
    }
 
-   const { title } = req.body;
+   const { title, description } = req.body;
    const { _id: userId } = getUserDetailsFromToken(req);
    User.findById(userId).exec((error, user) => {
       if (error || !user) {
          return res.status(400).json({ error: "User is not valid" });
       }
 
-      const project = new Project({ title, admin: user });
+      const project = new Project({ title, description, admin: user });
       project.save((error, project) => {
          if (error) {
             return res.status(400).json({ error: "Unable to create project" });
