@@ -62,3 +62,34 @@ exports.getProjects = (req, res) => {
          return res.status(200).json(userProjects);
       });
 };
+
+exports.getProjectDetails = (req, res) => {
+   const {
+      params: { id },
+   } = req;
+
+   Project.findById(id)
+      .populate("admin")
+      .exec((error, project) => {
+         if (error || !project) {
+            return res.status(400).json({ error: "Project not found" });
+         }
+         const {
+            _id: id,
+            title,
+            description,
+            admin: { _id: adminId, name },
+            stages,
+         } = project;
+         return res
+            .status(200)
+            .json({
+               id,
+               title,
+               description,
+               admin_id: adminId,
+               admin_name: name,
+               stages,
+            });
+      });
+};
