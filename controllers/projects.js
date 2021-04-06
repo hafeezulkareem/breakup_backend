@@ -44,7 +44,7 @@ exports.createProject = (req, res) => {
 exports.getProjects = (req, res) => {
    const { _id: userId } = getUserDetailsFromToken(req);
    User.findById(userId)
-      .populate({ path: "projects", populate: { path: "admin" } })
+      .populate({ path: "projects" })
       .exec((error, user) => {
          if (error) {
             return res.status(400).json({ error: "Unable to get projects" });
@@ -52,20 +52,11 @@ exports.getProjects = (req, res) => {
          const { projects } = user;
          const userProjects = [];
          projects.forEach((project) => {
-            const {
-               _id: id,
-               title,
-               description,
-               admin: { _id: adminId, name },
-               stages,
-            } = project;
+            const { _id: id, title, description } = project;
             userProjects.push({
                id,
                title,
                description: description ? description : "",
-               admin_id,
-               admin_name: name,
-               stages,
             });
          });
          return res.status(200).json(userProjects);
