@@ -17,7 +17,6 @@ const projectSchema = mongoose.Schema(
          type: mongoose.Schema.ObjectId,
          ref: "User",
       },
-      stages: [{ type: mongoose.Schema.ObjectId, ref: "Stage" }],
    },
    { timestamp: true }
 );

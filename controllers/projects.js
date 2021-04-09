@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const Project = require("../models/project");
+const Stage = require("../models/stage");
 const { getUserDetailsFromToken } = require("../utils/authUtils");
 
 exports.createProject = (req, res) => {
@@ -74,22 +75,28 @@ exports.getProjectDetails = (req, res) => {
          if (error || !project) {
             return res.status(400).json({ error: "Project not found" });
          }
-         const {
-            _id: id,
-            title,
-            description,
-            admin: { _id: adminId, name },
-            stages,
-         } = project;
-         return res
-            .status(200)
-            .json({
+         Stage.find({ project: id }).exec((error, stages) => {
+            if (error) {
+               res.status(400).json({ error: "Unable to get project details" });
+            }
+            const {
+               _id: id,
+               title,
+               description,
+               admin: { _id: adminId, name },
+            } = project;
+            const projectStages = stages.map((stage) => {
+               const { _id: id, tasks, name } = stage;
+               return { id, name, tasks };
+            });
+            return res.status(200).json({
                id,
                title,
                description,
                admin_id: adminId,
                admin_name: name,
-               stages,
+               stages: projectStages,
             });
+         });
       });
 };
