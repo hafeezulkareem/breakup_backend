@@ -8,6 +8,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
 const projectRoutes = require("./routes/projects");
+const stageRoutes = require("./routes/stages");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(cors());
 
 app.use("/api", authRoutes);
 app.use("/api", projectRoutes);
+app.use("/api", stageRoutes);
 
 const port = process.env.PORT || 3001;
 

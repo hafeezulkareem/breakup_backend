@@ -17,10 +17,7 @@ const projectSchema = mongoose.Schema(
          type: mongoose.Schema.ObjectId,
          ref: "User",
       },
-      stages: {
-         type: Array,
-         default: [],
-      },
+      stages: [{ type: mongoose.Schema.ObjectId, ref: "Stage" }],
    },
    { timestamp: true }
 );
