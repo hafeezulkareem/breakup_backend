@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const User = require("../models/user");
 const Project = require("../models/project");
 const Stage = require("../models/stage");
+const Task = require("../models/task");
 const { getUserDetailsFromToken } = require("../utils/authUtils");
 
 exports.createProject = (req, res) => {
@@ -66,36 +67,53 @@ exports.getProjects = (req, res) => {
 
 exports.getProjectDetails = (req, res) => {
    const {
-      params: { id },
+      params: { id: projectId },
    } = req;
 
-   Project.findById(id)
+   Project.findById(projectId)
       .populate("admin")
       .exec((error, project) => {
          if (error || !project) {
             return res.status(400).json({ error: "Project not found" });
          }
-         Stage.find({ project: id }).exec((error, stages) => {
+         Stage.find({ project: projectId }).exec((error, stages) => {
             if (error) {
                res.status(400).json({ error: "Unable to get project details" });
             }
             const {
-               _id: id,
+               _id: projectId,
                title,
                description,
                admin: { _id: adminId, name },
             } = project;
-            const projectStages = stages.map((stage) => {
-               const { _id: id, tasks, name } = stage;
-               return { id, name, tasks };
+            const projectStages = stages.map(async (stage) => {
+               const { _id: stageId, name } = stage;
+               const stageTasks = [];
+               const tasks = await Task.find(
+                  { project: projectId, stage: stageId },
+                  (error, tasks) => {
+                     if (error) {
+                        return res
+                           .status(400)
+                           .json({ error: "Unable to get project details" });
+                     }
+                  }
+               );
+               tasks.forEach((task) => {
+                  const { _id: taskId, title } = task;
+                  stageTasks.push({ id: taskId, title });
+               });
+               return { id: stageId, name, tasks: stageTasks };
             });
-            return res.status(200).json({
-               id,
-               title,
-               description,
-               admin_id: adminId,
-               admin_name: name,
-               stages: projectStages,
+            Promise.all(projectStages).then((stages) => {
+               return res.status(200).json({
+                  id: projectId,
+                  title,
+                  description,
+                  admin_id: adminId,
+                  admin_name: name,
+                  stages,
+               });
             });
          });
       });
