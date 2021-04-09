@@ -2,15 +2,15 @@ const express = require("express");
 const { check } = require("express-validator");
 
 const { isSignedIn } = require("../controllers/auth");
-const { createStage } = require("../controllers/stages");
+const { createTask } = require("../controllers/tasks");
 
 const router = express.Router();
 
 router.post(
-   "/project/:id/stage",
-   [check("name", "Name is required").isLength({ min: 3 })],
+   "/project/:projectId/stage/:stageId/task",
+   [check("title", "Title is required").isLength({ min: 1 })],
    isSignedIn,
-   createStage
+   createTask
 );
 
 module.exports = router;
