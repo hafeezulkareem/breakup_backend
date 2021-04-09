@@ -3,7 +3,11 @@ const { check } = require("express-validator");
 
 const router = express.Router();
 
-const { createProject, getProjects } = require("../controllers/projects");
+const {
+   createProject,
+   getProjects,
+   getProjectDetails,
+} = require("../controllers/projects");
 const { isSignedIn } = require("../controllers/auth");
 
 router.post(
@@ -14,5 +18,7 @@ router.post(
 );
 
 router.get("/projects", isSignedIn, getProjects);
+
+router.get("/project/:id", isSignedIn, getProjectDetails);
 
 module.exports = router;
