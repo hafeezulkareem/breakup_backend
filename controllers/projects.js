@@ -118,3 +118,48 @@ exports.getProjectDetails = (req, res) => {
          });
       });
 };
+
+exports.addUser = (req, res) => {
+   const errors = validationResult(req);
+
+   if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array()[0] });
+   }
+
+   const {
+      params: { id },
+   } = req;
+
+   const { email } = req.body;
+   User.findOne({ email }).exec((error, user) => {
+      if (error || !user) {
+         return res.status(400).json({ error: "User not found" });
+      }
+      Project.findById(id).exec((error, project) => {
+         if (error || !project) {
+            return res.status(400).json({ error: "Project not found" });
+         }
+
+         const { members } = project;
+         const { _id: userId } = user;
+         if (members.indexOf(userId) !== -1) {
+            return res
+               .status(400)
+               .json({ error: "User is already added to the project" });
+         }
+
+         project.updateOne(
+            { $push: { members: user } },
+            { useFindAndModify: false },
+            (error, members) => {
+               if (error) {
+                  return res
+                     .status(400)
+                     .json({ error: "Unable to create project" });
+               }
+               return res.status(200).json({});
+            }
+         );
+      });
+   });
+};

@@ -17,6 +17,7 @@ const projectSchema = mongoose.Schema(
          type: mongoose.Schema.ObjectId,
          ref: "User",
       },
+      members: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
    },
    { timestamp: true }
 );

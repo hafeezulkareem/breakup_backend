@@ -7,6 +7,7 @@ const {
    createProject,
    getProjects,
    getProjectDetails,
+   addUser,
 } = require("../controllers/projects");
 const { isSignedIn } = require("../controllers/auth");
 
@@ -20,5 +21,7 @@ router.post(
 router.get("/projects", isSignedIn, getProjects);
 
 router.get("/project/:id", isSignedIn, getProjectDetails);
+
+router.post("/project/:id/add-user", isSignedIn, addUser);
 
 module.exports = router;
