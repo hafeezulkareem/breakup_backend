@@ -6,8 +6,10 @@ const taskSchema = mongoose.Schema(
          type: String,
          trim: true,
       },
-      stage: { type: mongoose.Schema.ObjectId, ref: "Stage" },
-      project: { type: mongoose.Schema.ObjectId, ref: "Project" },
+      assignee: {
+         type: mongoose.Schema.ObjectId,
+         ref: "User",
+      },
    },
    { timestamp: true }
 );

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const { ADMIN } = require("../constants/roles");
+
 const projectSchema = mongoose.Schema(
    {
       title: {
@@ -13,11 +15,13 @@ const projectSchema = mongoose.Schema(
          maxlength: 500,
          trim: true,
       },
-      admin: {
-         type: mongoose.Schema.ObjectId,
-         ref: "User",
-      },
-      members: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+      stages: [{ type: mongoose.Schema.ObjectId, ref: "Stage" }],
+      members: [
+         {
+            user: { type: mongoose.Schema.ObjectId, ref: "User" },
+            role: { type: String, default: ADMIN },
+         },
+      ],
    },
    { timestamp: true }
 );
