@@ -20,13 +20,14 @@ exports.createStage = (req, res) => {
          return res.status(400).json({ error: "Project doesn't exists" });
       }
 
-      const stage = new Stage({ name, project });
-      stage.save((error, stage) => {
+      const stage = new Stage({ name });
+      stage.save(async (error, stage) => {
          if (error) {
             res.status(400).json({ error: "Unable to create stage" });
          }
+         await project.updateOne({ $push: { stages: stage } });
+         const { _id } = stage;
+         return res.status(200).json({ id: _id });
       });
-      const { _id } = stage;
-      return res.status(200).json({ id: _id });
    });
 };
