@@ -31,3 +31,47 @@ exports.createStage = (req, res) => {
       });
    });
 };
+
+exports.updateOrder = (req, res) => {
+   const errors = validationResult(req);
+
+   if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array()[0].msg });
+   }
+
+   const {
+      params: { projectId, stageId },
+      body: { order },
+   } = req;
+
+   Project.findById(projectId)
+      .populate("stages")
+      .exec((error, project) => {
+         if (error || !project) {
+            return res.status(400).json({ error: "Project not found" });
+         }
+
+         const { stages } = project;
+
+         if (order >= stages.length) {
+            return res.status(400).json({ error: "Order is not valid" });
+         }
+         const stage = stages.find((stage) => stage._id == stageId);
+         if (!stage) {
+            return res.status(400).json({ error: "Stage not found" });
+         }
+         const updatedStages = stages.filter((stage) => stage._id != stageId);
+         updatedStages.splice(order, 0, stage);
+         project.updateOne(
+            { $set: { stages: updatedStages } },
+            (error, stages) => {
+               if (error) {
+                  return res
+                     .status(400)
+                     .json({ error: "Unable to update the order of stage" });
+               }
+               return res.status(200).json({});
+            }
+         );
+      });
+};
