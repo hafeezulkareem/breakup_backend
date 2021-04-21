@@ -2,9 +2,8 @@ const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const Project = require("../models/project");
-const Stage = require("../models/stage");
-const Task = require("../models/task");
 const { getUserDetailsFromToken } = require("../utils/authUtils");
+const { MEMBER } = require("../constants/roles");
 
 exports.createProject = (req, res) => {
    const errors = validationResult(req);
@@ -20,7 +19,7 @@ exports.createProject = (req, res) => {
          return res.status(400).json({ error: "User is not valid" });
       }
 
-      const project = new Project({ title, description, admin: user });
+      const project = new Project({ title, description, members: [user] });
       project.save((error, project) => {
          if (error) {
             return res.status(400).json({ error: "Unable to create project" });
@@ -71,50 +70,38 @@ exports.getProjectDetails = (req, res) => {
    } = req;
 
    Project.findById(projectId)
-      .populate("admin")
+      .populate("members")
+      .populate("stages")
       .exec((error, project) => {
          if (error || !project) {
             return res.status(400).json({ error: "Project not found" });
          }
-         Stage.find({ project: projectId }).exec((error, stages) => {
-            if (error) {
-               res.status(400).json({ error: "Unable to get project details" });
-            }
-            const {
-               _id: projectId,
-               title,
-               description,
-               admin: { _id: adminId, name },
-            } = project;
-            const projectStages = stages.map(async (stage) => {
-               const { _id: stageId, name } = stage;
-               const stageTasks = [];
-               const tasks = await Task.find(
-                  { project: projectId, stage: stageId },
-                  (error, tasks) => {
-                     if (error) {
-                        return res
-                           .status(400)
-                           .json({ error: "Unable to get project details" });
-                     }
-                  }
-               );
-               tasks.forEach((task) => {
-                  const { _id: taskId, title } = task;
-                  stageTasks.push({ id: taskId, title });
-               });
-               return { id: stageId, name, tasks: stageTasks };
+         const {
+            _id: projectId,
+            title,
+            description,
+            members,
+            stages,
+         } = project;
+         const projectStages = stages.map((stage) => {
+            const { _id: stageId, name, tasks } = stage;
+            const stageTasks = [];
+            tasks.forEach((task) => {
+               const { _id: taskId, title } = task;
+               stageTasks.push({ id: taskId, title });
             });
-            Promise.all(projectStages).then((stages) => {
-               return res.status(200).json({
-                  id: projectId,
-                  title,
-                  description,
-                  admin_id: adminId,
-                  admin_name: name,
-                  stages,
-               });
-            });
+            return { id: stageId, name, tasks: stageTasks };
+         });
+         const projectMembers = members.map((member) => {
+            const { _id: memberId, role } = member;
+            return { id: memberId, role };
+         });
+         return res.status(200).json({
+            id: projectId,
+            title,
+            description,
+            stages: projectStages,
+            members: projectMembers,
          });
       });
 };
@@ -149,7 +136,7 @@ exports.addUser = (req, res) => {
          }
 
          project.updateOne(
-            { $push: { members: user } },
+            { $push: { members: { user, role: MEMBER } } },
             { useFindAndModify: false },
             (error, members) => {
                if (error) {
