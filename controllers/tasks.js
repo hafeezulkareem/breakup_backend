@@ -1,6 +1,5 @@
 const { validationResult } = require("express-validator");
 
-const Project = require("../models/project");
 const Stage = require("../models/stage");
 const Task = require("../models/task");
 
@@ -12,26 +11,22 @@ exports.createTask = (req, res) => {
    }
 
    const {
-      params: { projectId, stageId },
+      params: { id },
       body: { title },
    } = req;
 
-   Project.findById(projectId).exec((error, project) => {
-      if (error) {
-         return res.status(400).json({ error: "Project is not valid" });
+   Stage.findById(id).exec((error, stage) => {
+      if (error || !stage) {
+         return res.status(400).json({ error: "Stage is not valid" });
       }
-      Stage.findById(stageId).exec((error, stage) => {
+      const task = new Task({ title });
+      task.save(async (error, task) => {
          if (error) {
-            return res.status(400).json({ error: "Stage is not valid" });
+            return res.status(400).json({ error: "Unable to add task" });
          }
-         const task = new Task({ title, stage, project });
-         task.save((error, task) => {
-            if (error) {
-               return res.status(400).json({ error: "Unable to add task" });
-            }
-            const { _id: id } = task;
-            return res.status(200).json({ id });
-         });
+         await stage.updateOne({ $push: { tasks: task } });
+         const { _id: id } = task;
+         return res.status(200).json({ id });
       });
    });
 };

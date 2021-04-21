@@ -7,7 +7,7 @@ const { createTask } = require("../controllers/tasks");
 const router = express.Router();
 
 router.post(
-   "/project/:projectId/stage/:stageId/task",
+   "/stage/:id/task",
    [check("title", "Title is required").isLength({ min: 1 })],
    isSignedIn,
    createTask
