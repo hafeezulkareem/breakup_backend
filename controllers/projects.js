@@ -71,7 +71,7 @@ exports.getProjectDetails = (req, res) => {
 
    Project.findById(projectId)
       .populate("members")
-      .populate("stages")
+      .populate({ path: "stages", populate: { path: "tasks" } })
       .exec((error, project) => {
          if (error || !project) {
             return res.status(400).json({ error: "Project not found" });
