@@ -2,7 +2,7 @@ const express = require("express");
 const { check } = require("express-validator");
 
 const { isSignedIn } = require("../controllers/auth");
-const { createTask } = require("../controllers/tasks");
+const { createTask, updateOrder } = require("../controllers/tasks");
 
 const router = express.Router();
 
@@ -11,6 +11,13 @@ router.post(
    [check("title", "Title is required").isLength({ min: 1 })],
    isSignedIn,
    createTask
+);
+
+router.put(
+   "/task/:id/order/update",
+   [check("order", "Order is not valid").isNumeric()],
+   isSignedIn,
+   updateOrder
 );
 
 module.exports = router;
