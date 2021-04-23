@@ -84,3 +84,24 @@ exports.updateOrder = (req, res) => {
          });
       });
 };
+
+exports.deleteTask = async (req, res) => {
+   const {
+      params: { stageId, taskId },
+   } = req;
+
+   try {
+      const stage = await Stage.findById(stageId).populate("tasks");
+      const { tasks } = stage;
+      const updatedTasks = tasks.filter((task) => task._id != taskId);
+      await stage.updateOne(
+         { $set: { tasks: updatedTasks } },
+         { useFindAndModify: false }
+      );
+      const task = await Task.findById(taskId);
+      await task.deleteOne();
+      return res.status(200).json();
+   } catch (error) {
+      return res.status(400).json({ error: "Unable to delete task" });
+   }
+};
