@@ -144,7 +144,18 @@ exports.addUser = (req, res) => {
                      .status(400)
                      .json({ error: "Unable to create project" });
                }
-               return res.status(200).json({});
+               user.updateOne(
+                  { $push: { projects: { project } } },
+                  { useFindAndModify: false },
+                  (error, projects) => {
+                     if (error) {
+                        return res
+                           .status(400)
+                           .json({ error: "Unable to create project" });
+                     }
+                     return res.status(200).json({});
+                  }
+               );
             }
          );
       });
