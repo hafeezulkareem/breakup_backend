@@ -161,3 +161,20 @@ exports.addUser = (req, res) => {
       });
    });
 };
+
+exports.updateDescription = async (req, res) => {
+   const {
+      params: { id },
+      body: { description },
+   } = req;
+
+   try {
+      const project = await Project.findById(id);
+      await project.updateOne({ description });
+      return res.status(200).json();
+   } catch (error) {
+      return res
+         .status(400)
+         .json({ error: "Unable to update project description" });
+   }
+};
