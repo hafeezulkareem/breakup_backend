@@ -96,3 +96,24 @@ exports.deleteStage = async (req, res) => {
       return res.status(400).json({ error: "Unable to delete stage" });
    }
 };
+
+exports.updateName = async (req, res) => {
+   const errors = validationResult(req);
+
+   if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0] });
+   }
+
+   const {
+      params: { id },
+      body: { name },
+   } = req;
+
+   try {
+      const stage = await Stage.findById(id);
+      await stage.updateOne({ name });
+      return res.status(200).json();
+   } catch (error) {
+      return res.status(400).json({ error: "Unable to update stage name" });
+   }
+};

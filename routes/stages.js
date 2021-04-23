@@ -6,6 +6,7 @@ const {
    createStage,
    updateOrder,
    deleteStage,
+   updateName,
 } = require("../controllers/stages");
 
 const router = express.Router();
@@ -27,6 +28,13 @@ router.delete(
    "/project/:projectId/stage/:stageId/delete",
    isSignedIn,
    deleteStage
+);
+
+router.put(
+   "/stage/:id/name/update",
+   [check("name", "Stage name is required").isLength({ min: 3 })],
+   isSignedIn,
+   updateName
 );
 
 module.exports = router;
