@@ -2,7 +2,11 @@ const express = require("express");
 const { check } = require("express-validator");
 
 const { isSignedIn } = require("../controllers/auth");
-const { createStage, updateOrder } = require("../controllers/stages");
+const {
+   createStage,
+   updateOrder,
+   deleteStage,
+} = require("../controllers/stages");
 
 const router = express.Router();
 
@@ -18,5 +22,11 @@ router.put("/project/:projectId/stage/:stageId/order/update", [
    isSignedIn,
    updateOrder,
 ]);
+
+router.delete(
+   "/project/:projectId/stage/:stageId/delete",
+   isSignedIn,
+   deleteStage
+);
 
 module.exports = router;

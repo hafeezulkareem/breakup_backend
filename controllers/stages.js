@@ -75,3 +75,24 @@ exports.updateOrder = (req, res) => {
          );
       });
 };
+
+exports.deleteStage = async (req, res) => {
+   const {
+      params: { projectId, stageId },
+   } = req;
+
+   try {
+      const project = await Project.findById(projectId).populate("stages");
+      const { stages } = project;
+      const updatedStages = stages.filter((stage) => stage._id != stageId);
+      await project.updateOne(
+         { $set: { stages: updatedStages } },
+         { useFindAndModify: false }
+      );
+      const stage = await Stage.findById(stageId);
+      await stage.deleteOne();
+      return res.status(200).json();
+   } catch (error) {
+      return res.status(400).json({ error: "Unable to delete stage" });
+   }
+};
