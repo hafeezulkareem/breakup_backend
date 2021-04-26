@@ -143,16 +143,17 @@ exports.addUser = (req, res) => {
                if (error) {
                   return res
                      .status(400)
-                     .json({ error: "Unable to create project" });
+                     .json({ error: "Unable to add member to the project" });
                }
+               const { _id } = project;
                user.updateOne(
-                  { $push: { projects: { project } } },
+                  { $push: { projects: { _id } } },
                   { useFindAndModify: false },
                   (error, projects) => {
                      if (error) {
-                        return res
-                           .status(400)
-                           .json({ error: "Unable to create project" });
+                        return res.status(400).json({
+                           error: "Unable to add member to the project",
+                        });
                      }
                      return res.status(200).json({});
                   }
