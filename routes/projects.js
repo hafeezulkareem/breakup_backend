@@ -23,7 +23,7 @@ router.get("/projects", isSignedIn, getProjects);
 
 router.get("/project/:id", isSignedIn, getProjectDetails);
 
-router.post("/project/:id/add-user", isSignedIn, addUser);
+router.post("/project/:id/member/add", isSignedIn, addUser);
 
 router.put("/project/:id/description/update", isSignedIn, updateDescription);
 
