@@ -128,8 +128,9 @@ exports.addUser = (req, res) => {
          }
 
          const { members } = project;
-         const { _id: userId } = user;
-         if (members.indexOf(userId) !== -1) {
+         const { email } = user;
+         const member = members.find((member) => member.user === email);
+         if (member) {
             return res
                .status(400)
                .json({ error: "User is already added to the project" });
