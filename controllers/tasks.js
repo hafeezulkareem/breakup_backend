@@ -105,3 +105,20 @@ exports.deleteTask = async (req, res) => {
       return res.status(400).json({ error: "Unable to delete task" });
    }
 };
+
+exports.updateDescription = async (req, res) => {
+   const {
+      params: { id },
+      body: { description },
+   } = req;
+
+   try {
+      const task = await Task.findById(id);
+      await task.updateOne({ description });
+      return res.status(200).json();
+   } catch (error) {
+      return res
+         .status(400)
+         .json({ error: "Unable to update task description" });
+   }
+};

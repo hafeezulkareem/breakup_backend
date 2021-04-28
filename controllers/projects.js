@@ -87,8 +87,8 @@ exports.getProjectDetails = (req, res) => {
             const { _id: stageId, name, tasks } = stage;
             const stageTasks = [];
             tasks.forEach((task) => {
-               const { _id: taskId, title } = task;
-               stageTasks.push({ id: taskId, title });
+               const { _id: taskId, title, description } = task;
+               stageTasks.push({ id: taskId, title, description });
             });
             return { id: stageId, name, tasks: stageTasks };
          });
