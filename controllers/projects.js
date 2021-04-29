@@ -70,7 +70,7 @@ exports.getProjectDetails = (req, res) => {
    } = req;
 
    Project.findById(projectId)
-      .populate("members")
+      .populate("members.user")
       .populate({ path: "stages", populate: { path: "tasks" } })
       .exec((error, project) => {
          if (error || !project) {
@@ -93,8 +93,12 @@ exports.getProjectDetails = (req, res) => {
             return { id: stageId, name, tasks: stageTasks };
          });
          const projectMembers = members.map((member) => {
-            const { _id: memberId, role } = member;
-            return { id: memberId, role };
+            const {
+               _id: userId,
+               user: { email, name },
+               role,
+            } = member;
+            return { id: userId, email, name, role };
          });
          return res.status(200).json({
             id: projectId,
