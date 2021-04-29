@@ -19,7 +19,12 @@ exports.createProject = (req, res) => {
          return res.status(400).json({ error: "User is not valid" });
       }
 
-      const project = new Project({ title, description, members: [{ user }] });
+      const project = new Project({
+         title,
+         description,
+         members: [{ user }],
+      });
+      console.log(project);
       project.save((error, project) => {
          if (error) {
             return res.status(400).json({ error: "Unable to create project" });
@@ -94,8 +99,7 @@ exports.getProjectDetails = (req, res) => {
          });
          const projectMembers = members.map((member) => {
             const {
-               _id: userId,
-               user: { email, name },
+               user: { _id: userId, email, name },
                role,
             } = member;
             return { id: userId, email, name, role };
@@ -132,8 +136,10 @@ exports.addUser = (req, res) => {
          }
 
          const { members } = project;
-         const { email } = user;
-         const member = members.find((member) => member.user === email);
+         const { _id: userId, email, name } = user;
+         const member = members.find(
+            (member) => member.user.toString() == userId.toString()
+         );
          if (member) {
             return res
                .status(400)
@@ -159,7 +165,7 @@ exports.addUser = (req, res) => {
                            error: "Unable to add member to the project",
                         });
                      }
-                     return res.status(200).json({});
+                     return res.status(200).json({ id: userId, name, email });
                   }
                );
             }
