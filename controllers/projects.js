@@ -76,7 +76,10 @@ exports.getProjectDetails = (req, res) => {
 
    Project.findById(projectId)
       .populate("members.user")
-      .populate({ path: "stages", populate: { path: "tasks" } })
+      .populate({
+         path: "stages",
+         populate: { path: "tasks", populate: { path: "assignee" } },
+      })
       .exec((error, project) => {
          if (error || !project) {
             return res.status(400).json({ error: "Project not found" });
@@ -92,8 +95,18 @@ exports.getProjectDetails = (req, res) => {
             const { _id: stageId, name, tasks } = stage;
             const stageTasks = [];
             tasks.forEach((task) => {
-               const { _id: taskId, title, description } = task;
-               stageTasks.push({ id: taskId, title, description });
+               const {
+                  _id: taskId,
+                  title,
+                  description,
+                  assignee: { _id: assigneeId, name, email },
+               } = task;
+               stageTasks.push({
+                  id: taskId,
+                  title,
+                  description,
+                  assignee: { name, email },
+               });
             });
             return { id: stageId, name, tasks: stageTasks };
          });

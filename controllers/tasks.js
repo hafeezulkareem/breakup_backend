@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const Stage = require("../models/stage");
 const Task = require("../models/task");
+const User = require("../models/user");
 
 exports.createTask = (req, res) => {
    const errors = validationResult(res);
@@ -120,5 +121,27 @@ exports.updateDescription = async (req, res) => {
       return res
          .status(400)
          .json({ error: "Unable to update task description" });
+   }
+};
+
+exports.assignMember = async (req, res) => {
+   const errors = validationResult(req);
+
+   if (!errors.isEmpty()) {
+      return res.status(422).json({ error: errors.array()[0].msg });
+   }
+
+   const {
+      params: { id },
+      body: { email },
+   } = req;
+
+   try {
+      const user = await User.findOne({ email });
+      const task = await Task.findById(id);
+      await task.updateOne({ assignee: user._id });
+      return res.status(200).json({ name: user.name });
+   } catch (error) {
+      return res.status(400).json({ error: "Unable to assign member" });
    }
 };

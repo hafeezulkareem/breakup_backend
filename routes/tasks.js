@@ -7,6 +7,7 @@ const {
    updateOrder,
    deleteTask,
    updateDescription,
+   assignMember,
 } = require("../controllers/tasks");
 
 const router = express.Router();
@@ -28,5 +29,12 @@ router.put(
 router.put("/task/:id/description/update", isSignedIn, updateDescription);
 
 router.delete("/stage/:stageId/task/:taskId/delete", isSignedIn, deleteTask);
+
+router.put(
+   "/task/:id/assign/member",
+   [check("email", "Email is not valid").isEmail()],
+   isSignedIn,
+   assignMember
+);
 
 module.exports = router;
