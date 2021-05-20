@@ -24,7 +24,6 @@ exports.createProject = (req, res) => {
          description,
          members: [{ user }],
       });
-      console.log(project);
       project.save((error, project) => {
          if (error) {
             return res.status(400).json({ error: "Unable to create project" });
