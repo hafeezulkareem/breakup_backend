@@ -11,6 +11,9 @@ const taskSchema = mongoose.Schema(
          trim: true,
          default: "",
       },
+      status: {
+         type: String,
+      },
       assignee: {
          type: mongoose.Schema.ObjectId,
          ref: "User",

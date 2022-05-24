@@ -13,14 +13,14 @@ exports.createTask = (req, res) => {
 
    const {
       params: { id },
-      body: { title },
+      body: { title, status },
    } = req;
 
    Stage.findById(id).exec((error, stage) => {
       if (error || !stage) {
          return res.status(400).json({ error: "Stage is not valid" });
       }
-      const task = new Task({ title });
+      const task = new Task({ title, status });
       task.save(async (error, task) => {
          if (error) {
             return res.status(400).json({ error: "Unable to add task" });
